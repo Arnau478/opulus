@@ -8,6 +8,10 @@ int main(int argc, char **argv){
     Chunk chunk;
     initChunk(&chunk);
 
+    int constant = addConstant(&chunk, 12.34);
+    writeChunk(&chunk, OP_CONSTANT);
+    writeChunk(&chunk, constant);
+
     writeChunk(&chunk, OP_RETURN);
 
 #ifdef DEBUG
