@@ -10,8 +10,6 @@ int main(int argc, char **argv){
 
 #ifdef DEBUG
     disassembleChunk(&chunk, "test chunk");
-    disassembleChunk(&chunk, "test chunk");
-    disassembleChunk(&chunk, "test chunk");
 #endif
 
     freeChunk(&chunk);
