@@ -42,8 +42,6 @@ int disassembleInstruction(Chunk *chunk, int offset){
 void disassembleChunk(Chunk *chunk, const char *name){
     printf("== %s ==\n", name);
 
-    printf("%i\n", chunk->count);
-
     for(int offset = 0; offset < chunk->count;){
         offset = disassembleInstruction(chunk, offset);
     }
