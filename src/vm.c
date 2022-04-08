@@ -38,6 +38,9 @@ static InterpretResult run(){
                 Value constant = READ_CONSTANT();
                 push(constant);
                 break;
+            case OP_NEGATE:
+                vm.stackTop[-1] *= -1;
+                break;
             case OP_RETURN:
                 printValue(pop());
                 printf("\n");
