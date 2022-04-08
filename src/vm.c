@@ -13,8 +13,8 @@ void freeVM(){
 }
 
 static InterpretResult run(){
-#define READ_CONSTANT() (*vm.ip++)
 #define READ_BYTE() (*vm.ip++)
+#define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
 #ifdef DEBUG
         printf("== execution trace ==\n");
@@ -36,14 +36,17 @@ static InterpretResult run(){
         switch(instruction = READ_BYTE()){
             case OP_CONSTANT:
                 Value constant = READ_CONSTANT();
+                push(constant);
                 break;
             case OP_RETURN:
+                printValue(pop());
+                printf("\n");
                 return INTERPRET_OK;
         }
     }
 
-#undef READ_BYTE
 #undef READ_CONSTANT
+#undef READ_BYTE
 }
 
 InterpretResult interpret(Chunk *chunk){
