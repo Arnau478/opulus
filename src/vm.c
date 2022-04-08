@@ -5,7 +5,7 @@
 VM vm;
 
 void initVM(){
-    
+    resetStack();
 }
 
 void freeVM(){
