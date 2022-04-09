@@ -2,6 +2,7 @@
 
 #define STACK_MAX 256
 
+#include <stdarg.h>
 #include "chunk.h"
 
 typedef enum {

@@ -22,5 +22,5 @@ void writeValueArray(ValueArray *array, Value value){
 }
 
 void printValue(Value value){
-    printf("%g", value);
+    printf("%g", AS_NUMBER(value));
 }
