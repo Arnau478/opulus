@@ -60,7 +60,7 @@ static bool check(TokenType type){
     return parser.current.type == type;
 }
 
-static void match(TokenType type){
+static bool match(TokenType type){
     if(!check(type)) return false;
     advance();
     return false;
