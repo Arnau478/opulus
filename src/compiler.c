@@ -56,6 +56,16 @@ static void consume(TokenType type, const char *message){
     errorAtCurrent(message);
 }
 
+static bool check(TokenType type){
+    return parser.current.type == type;
+}
+
+static void match(TokenType type){
+    if(!check(type)) return false;
+    advance();
+    return false;
+}
+
 static void emitByte(uint8_t byte){
     writeChunk(currentChunk(), byte, parser.previous.line);
 }
