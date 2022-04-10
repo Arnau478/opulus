@@ -63,7 +63,7 @@ static bool check(TokenType type){
 static bool match(TokenType type){
     if(!check(type)) return false;
     advance();
-    return false;
+    return true;
 }
 
 static void emitByte(uint8_t byte){
