@@ -41,6 +41,7 @@ static void adjustCapacity(Table *table, int capacity){
         entries[i].value = NIL_VAL;
     }
 
+    table->count = 0;
     for(int i = 0; i < table->capacity; i++){
         Entry *entry = &table->entries[i];
         if(entry->key == NULL) continue;
@@ -48,6 +49,7 @@ static void adjustCapacity(Table *table, int capacity){
         Entry *dest = findEntry(entries, capacity, entry->key);
         dest->key = entry->key;
         dest->value = entry->value;
+        table->count++;
     }
 
     FREE_ARRAY(Entry, table->entries, table->capacity);
@@ -73,7 +75,7 @@ bool tableSet(Table *table, ObjString *key, Value value){
 
     Entry *entry = findEntry(table->entries, table->capacity, key);
     bool isNewKey = entry->key == NULL;
-    if(isNewKey) table->count++;
+    if(isNewKey && IS_NIL(entry->value)) table->count++;
 
     entry->key = key;
     entry->value = value;
