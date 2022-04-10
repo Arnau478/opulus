@@ -45,6 +45,16 @@ static void adjustCapacity(Table *table, int capacity){
     table->capacity = capacity;
 }
 
+bool tableGet(Table *table, ObjString *key, Value *value){
+    if(table->count == 0) return false;
+
+    Entry *entry = findEntry(table->entries, table->capacity, key);
+    if(entry->key == NULL) return false;
+
+    *value = entry->value;
+    return true;
+}
+
 bool tableSet(Table *table, ObjString *key, Value value){
     if(table->count + 1 > table->capacity * TABLE_MAX_LOAD){
         int capacity = GROW_CAPACITY(table->capacity);
