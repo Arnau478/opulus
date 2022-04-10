@@ -9,10 +9,11 @@ VM vm;
 
 void initVM(){
     resetStack();
+    vm.objects = NULL;
 }
 
 void freeVM(){
-
+    freeObjects();
 }
 
 static Value peek(int distance){
