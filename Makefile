@@ -1,6 +1,6 @@
 CC=gcc
 
-CFLAGS=-DDEBUG
+CFLAGS=
 
 C_SOURCES=$(wildcard src/*.c)
 
@@ -13,6 +13,12 @@ define print_cmd
 	eval $(1)
 endef
 
+default: opulus
+
+debug:
+	@$(call print_info,"Debug mode")
+	$(eval CFLAGS += -DDEBUG)
+
 opulus: $(C_SOURCES)
 	@$(call print_info,"Building main binary")
 	@$(call print_cmd,"$(CC) $^ -o $@ $(CFLAGS)")
@@ -21,4 +27,4 @@ clean:
 	@$(call print_info,"Cleaning")
 	@$(call print_cmd,"rm -f ./opulus")
 
-.PHONY: clean
+.PHONY: default debug clean
