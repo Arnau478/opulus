@@ -5,6 +5,7 @@
 #include "value.h"
 
 Parser parser;
+Compiler *current = NULL;
 Chunk *compilingChunk;
 
 static Chunk *currentChunk(){
@@ -91,6 +92,12 @@ static uint8_t makeConstant(Value value){
 
 static void emitConstant(Value value){
     emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
+static void initCompiler(Compiler *compiler){
+    compiler->localCount = 0;
+    compiler->scopeDepth = 0;
+    current = compiler;
 }
 
 static void endCompiler(){
@@ -336,6 +343,8 @@ static void statement(){
 
 bool compile(const char *source, Chunk *chunk){
     initScanner(source);
+    Compiler compiler;
+    initCompiler(&compiler);
     compilingChunk = chunk;
 
     parser.hadError = false;
