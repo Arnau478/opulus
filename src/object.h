@@ -1,8 +1,11 @@
 #pragma once
 
 #include <stdint.h>
-#include "value.h"
+#include <string.h>
+#include "memory.h"
 #include "table.h"
+#include "value.h"
+#include "vm.h"
 
 #define OBJ_TYPE(value) (AS_OBJ(value)->type)
 

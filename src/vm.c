@@ -1,9 +1,4 @@
-#include <string.h>
 #include "vm.h"
-#include "chunk.h"
-#include "debug.h"
-#include "compiler.h"
-#include "object.h"
 
 VM vm;
 

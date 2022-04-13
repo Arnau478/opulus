@@ -1,9 +1,11 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <stdbool.h>
+#include <string.h>
 #include "memory.h"
+#include "object.h"
 
 typedef struct Obj Obj;
 typedef struct ObjString ObjString;

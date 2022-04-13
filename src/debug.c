@@ -1,7 +1,6 @@
 #ifdef DEBUG
 
 #include "debug.h"
-#include "value.h"
 
 static int simpleInstruction(const char *name, int offset){
     printf("%s\n", name);

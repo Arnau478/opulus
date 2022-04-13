@@ -3,7 +3,11 @@
 #define STACK_MAX 256
 
 #include <stdarg.h>
+#include <string.h>
 #include "chunk.h"
+#include "compiler.h"
+#include "debug.h"
+#include "object.h"
 #include "table.h"
 
 typedef enum {
