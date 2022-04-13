@@ -1,8 +1,4 @@
 #include "compiler.h"
-#include "debug.h"
-#include "object.h"
-#include "debug.h"
-#include "value.h"
 
 Parser parser;
 Chunk *compilingChunk;

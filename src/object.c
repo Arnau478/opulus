@@ -1,7 +1,4 @@
-#include <string.h>
 #include "object.h"
-#include "memory.h"
-#include "vm.h"
 
 #define ALLOCATE_OBJ(type, objectType) \
     (type *)allocateObject(sizeof(type), objectType);
