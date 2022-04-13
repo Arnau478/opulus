@@ -1,4 +1,6 @@
 #include "memory.h"
+#include "object.h"
+#include "vm.h"
 
 void *reallocate(void *ptr, size_t oldSize, size_t newSize){
     if(newSize == 0){

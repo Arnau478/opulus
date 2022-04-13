@@ -1,4 +1,6 @@
+#include <string.h>
 #include "table.h"
+#include "object.h"
 
 void initTable(Table *table){
     table->count = 0;

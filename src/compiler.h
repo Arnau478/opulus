@@ -1,12 +1,9 @@
 #pragma once
 
-#include <stdbool.h>
 #include <stdio.h>
-#include "chunk.h"
-#include "debug.h"
-#include "object.h"
+#include <stdbool.h>
 #include "scanner.h"
-#include "value.h"
+#include "chunk.h"
 
 typedef struct {
     Token current;

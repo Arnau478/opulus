@@ -1,9 +1,7 @@
 #pragma once
 
-#include <stddef.h>
 #include <stdlib.h>
-#include "object.h"
-#include "vm.h"
+#include <stddef.h>
 
 #define ALLOCATE(type, count) \
     (type *)reallocate(NULL, 0, sizeof(type) * (count))
