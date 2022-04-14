@@ -34,4 +34,15 @@ typedef struct {
     Precedence precedence;
 } ParseRule;
 
+typedef struct {
+    Token name;
+    int depth;
+} Local;
+
+typedef struct {
+    Local locals[UINT8_MAX + 1];
+    int localCount;
+    int scopeDepth;
+} Compiler;
+
 bool compile(const char *source, Chunk *chunk);
