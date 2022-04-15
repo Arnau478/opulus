@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "object.h"
 #include "scanner.h"
 #include "chunk.h"
 

@@ -587,8 +587,7 @@ static void statement(){
 ObjFunction *compile(const char *source){
     initScanner(source);
     Compiler compiler;
-    initCompiler(&compiler);
-    compilingChunk = chunk;
+    initCompiler(&compiler, TYPE_SCRIPT);
 
     parser.hadError = false;
     parser.panicMode = false;
