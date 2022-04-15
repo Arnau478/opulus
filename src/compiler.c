@@ -129,6 +129,9 @@ static void initCompiler(Compiler *compiler, FunctionType type){
     compiler->scopeDepth = 0;
     compiler->function = newFunction();
     current = compiler;
+    if(type != TYPE_SCRIPT){
+        current->function->name = copyString(parser.previous.start, parser.previous.length);
+    }
 
     Local *local = &current->locals[current->localCount++];
     local->depth = 0;
@@ -432,6 +435,17 @@ static void function(FunctionType type){
     beginScope();
 
     consume(TOKEN_LEFT_PAREN, "Expected '(' after function name");
+    if(!check(TOKEN_RIGHT_PAREN)){
+        do{
+            current->function->arity++;
+            if(current->function->arity > 255){
+                errorAtCurrent("A function cannot have more that 255 parameters");
+            }
+            uint8_t constant = parseVariable("Expected parameter name");
+            defineVariable(constant);
+        }
+        while(match(TOKEN_COMMA));
+    }
     consume(TOKEN_RIGHT_PAREN, "Expected ')' after parameters");
     consume(TOKEN_LEFT_BRACE, "Expected '{' before function body"),
     block();
