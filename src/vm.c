@@ -1,12 +1,28 @@
 #include <string.h>
+#include <time.h>
 #include "vm.h"
 #include "chunk.h"
 #include "debug.h"
 #include "compiler.h"
 #include "object.h"
-#include "natives.h"
 
 VM vm;
+
+static Value n_clock(int argCount, Value *args){
+    return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
+}
+
+static void defineNative(const char *name, NativeFn function){
+    push(OBJ_VAL(copyString(name, (int)strlen(name))));
+    push(OBJ_VAL(newNative(function)));
+    tableSet(&vm.globals, AS_STRING(vm.stack[0]), vm.stack[1]);
+    pop();
+    pop();
+}
+
+static void defineNatives(){
+    defineNative("clock", n_clock);
+}
 
 void initVM(){
     resetStack();
