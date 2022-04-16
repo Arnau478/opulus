@@ -72,6 +72,12 @@ static bool callValue(Value callee, int argCount){
         switch(OBJ_TYPE(callee)){
             case OBJ_FUNCTION:
                 return call(AS_FUNCTION(callee), argCount);
+            case OBJ_NATIVE:
+                NativeFn native = AS_NATIVE(callee);
+                Value result = native(argCount, vm.stackTop - argCount);
+                vm.stackTop -= argCount + 1;
+                push(result);
+                return true;
             default: break;
         }
     }
