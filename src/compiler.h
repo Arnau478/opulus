@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "object.h"
 #include "scanner.h"
 #include "chunk.h"
 
@@ -39,10 +40,19 @@ typedef struct {
     int depth;
 } Local;
 
+typedef enum {
+    TYPE_FUNCTION,
+    TYPE_SCRIPT,
+} FunctionType;
+
 typedef struct {
+    struct Compiler *enclosing;
+    ObjFunction *function;
+    FunctionType type;
+
     Local locals[UINT8_MAX + 1];
     int localCount;
     int scopeDepth;
 } Compiler;
 
-bool compile(const char *source, Chunk *chunk);
+ObjFunction *compile(const char *source);
