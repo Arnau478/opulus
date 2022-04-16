@@ -23,6 +23,22 @@ static Value n_input(int argCount, Value *args){
     return ret;
 }
 
+static Value n_num(int argCount, Value *args){
+    if(argCount == 1 && IS_STRING(args[0])){
+        return NUMBER_VAL(strtod(AS_CSTRING(args[0]), NULL));
+    }
+    return NIL_VAL;
+}
+
+static Value n_str(int argCount, Value *args){
+    if(argCount == 1 && IS_NUMBER(args[0])){
+        char *str = malloc(sizeof(char) * 256);
+        sprintf(str, "%g", AS_NUMBER(args[0]));
+        return OBJ_VAL(copyString(str, (int)strlen(str)));
+    }
+    return NIL_VAL;
+}
+
 static void defineNative(const char *name, NativeFn function){
     push(OBJ_VAL(copyString(name, (int)strlen(name))));
     push(OBJ_VAL(newNative(function)));
@@ -34,6 +50,8 @@ static void defineNative(const char *name, NativeFn function){
 static void defineNatives(){
     defineNative("clock", n_clock);
     defineNative("input", n_input);
+    defineNative("num", n_num);
+    defineNative("str", n_str);
 }
 
 void initVM(){
