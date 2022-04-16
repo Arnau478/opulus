@@ -93,6 +93,7 @@ static int emitJump(int instruction){
 }
 
 static void emitReturn(){
+    emitByte(OP_NIL);
     emitByte(OP_RETURN);
 }
 
