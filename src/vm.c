@@ -4,6 +4,7 @@
 #include "debug.h"
 #include "compiler.h"
 #include "object.h"
+#include "natives.h"
 
 VM vm;
 
@@ -13,6 +14,8 @@ void initVM(){
 
     initTable(&vm.globals);
     initTable(&vm.strings);
+
+    defineNatives();
 }
 
 void freeVM(){
