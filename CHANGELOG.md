@@ -1,0 +1,46 @@
+# CHANGELOG
+
+## v1.0.0
+ - Data types
+   - Numbers
+   - Strings
+   - Booleans
+   - Nil
+   - Functions
+   - Native functions
+ - Global and local dynamically typed variables
+ - Native functions
+   - `clock()` Get program run-time in seconds 
+   - `input()` Get input from user
+   - `num()` Cast a string into a number
+   - `str()` Cast a number into a string
+ - Control flow
+   - If/else
+   - Short-circuited and/or
+   - While
+   - For
+ - Operators
+   - Unary
+     - `!` Boolean not
+     - `-` Number negation
+   - Binary
+     - `+` Addition/concatenation
+     - `-` Subtraction
+     - `*` Multiplication
+     - `/` Division
+     - `or` Logical "or"
+     - `and` Logical "and"
+     - `>` Greater than
+     - `>=` Greater than or equal
+     - `<` Less than
+     - `<=` Less than or equal
+     - `==` Equal
+     - `!=` Not equal
+   - Print statement
+   - Return statement
+   - Literals
+     - Number literals
+     - String literals
+     - Identifiers
+   - Internal hash tables
+   - Scoping
