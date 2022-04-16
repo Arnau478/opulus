@@ -12,6 +12,17 @@ static Value n_clock(int argCount, Value *args){
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
 
+static Value n_input(int argCount, Value *args){
+    if(argCount > 0){
+        printValue(args[0]);
+    }
+    char *str = malloc(sizeof(char) * 256);
+    scanf("%s", str);
+    Value ret = OBJ_VAL(copyString(str, (int)strlen(str)));
+    free(str);
+    return ret;
+}
+
 static void defineNative(const char *name, NativeFn function){
     push(OBJ_VAL(copyString(name, (int)strlen(name))));
     push(OBJ_VAL(newNative(function)));
@@ -22,6 +33,7 @@ static void defineNative(const char *name, NativeFn function){
 
 static void defineNatives(){
     defineNative("clock", n_clock);
+    defineNative("input", n_input);
 }
 
 void initVM(){
