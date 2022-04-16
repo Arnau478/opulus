@@ -1,8 +1,28 @@
 # Opulus
-This is basically the programming language I've been planning to create for about 1 year now
+Opulus is a high-performance bytecode-compiled programming language
 
-## But... where's the code?
-All the code will be on `develop` branch until production
+Developed and designed by Arnau478
 
-## Why another programming language?
-I know I have a lot of programming languages. Some of them are compiled and some of them are interpreted. But the fact that I start this one doesn't mean I'm going to quit developing them. It's just that I want to try some new things. Also, most of the languages I've made are compiled to native code, so I wanted to develop a JIT bytecode one.
+# Build opulus
+To compiler from source on Linux, follow the steps below.
+
+1. Download [the latest release](https://github.com/Arnau478/opulus/releases)
+2. Make sure you have `gcc` and `make` installed
+3. Run the following command from shell:
+```shell
+$ make opulus
+```
+4. An executable named `opulus` will be generated. That's the compiler.
+
+# How to use
+You can run Opulus in two different ways
+
+## REPL (**R**ead-**E**val-**P**rint **L**oop)
+If you just execute the compiler, you will enter this mode. Here, you can type lines of code that get immediately executed.
+
+## File execute
+Most of the time, you will need to execute an opulus source file. You can do this by passing the file name as the only parameter to the opulus executable. The file will be run.
+
+# Changelog
+
+You can read the changelog [here](CHANGELOG.md)
