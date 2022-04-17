@@ -330,6 +330,9 @@ static InterpretResult run(){
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
                 break;
+            case OP_CLONE:
+                push(*(vm.stackTop-1));
+                break;
         }
     }
 
