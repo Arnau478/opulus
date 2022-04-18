@@ -81,18 +81,23 @@ static void runtimeError(const char *format, ...){
     vfprintf(stderr, format, args);
     va_end(args);
     fputs("\n", stderr);
-
+    
     for(int i = vm.frameCount - 1; i >= 0; i--){
-        CallFrame *frame = &vm.frames[i];
-        ObjFunction *function = frame->function;
-        size_t instruction = frame->ip - function->chunk.code - 1;
-        fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+        if(vm.frameCount < 8 || i+5 > vm.frameCount || i == 0){
+            CallFrame *frame = &vm.frames[i];
+            ObjFunction *function = frame->function;
+            size_t instruction = frame->ip - function->chunk.code - 1;
+            fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
 
-        if(function->name == NULL){
-            fprintf(stderr, "script\n");
+            if(function->name == NULL){
+                fprintf(stderr, "script\n");
+            }
+            else{
+                fprintf(stderr, "%s()\n", function->name->chars);
+            }
         }
-        else{
-            fprintf(stderr, "%s()\n", function->name->chars);
+        else if(vm.frameCount < 8 || i+5 == vm.frameCount){
+            printf("...\n");
         }
     }
 
