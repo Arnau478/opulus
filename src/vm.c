@@ -153,6 +153,17 @@ static void concatenate(){
     push(OBJ_VAL(result));
 }
 
+static void addToArray(ObjArray *array, Value value){
+    if(array->count >= array->capacity){
+        int oldCapacity = array->capacity;
+        array->capacity = GROW_CAPACITY(oldCapacity);
+        array->values = GROW_ARRAY(Value, array->values, oldCapacity, array->capacity);
+    }
+
+    array->values[array->count] = value;
+    array->count++;
+}
+
 static InterpretResult run(){
     CallFrame *frame = &vm.frames[vm.frameCount - 1];
 
@@ -330,6 +341,14 @@ static InterpretResult run(){
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
                 break;
+            case OP_SPAWN_ARRAY:
+                int elementCount = READ_BYTE();
+                ObjArray *array = newArray();
+                for(int i = 0; i < elementCount; i++){
+                    addToArray(array, *(vm.stackTop-(elementCount-i)));
+                }
+                vm.stackTop -= elementCount;
+                push(OBJ_VAL(array));
         }
     }
 
