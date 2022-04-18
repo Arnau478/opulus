@@ -52,6 +52,10 @@ static Value n_len(int argCount, Value *args){
     return NIL_VAL;
 }
 
+static Value n_exit(int argCount, Value *args){
+    exit(0);
+}
+
 static void defineNative(const char *name, NativeFn function){
     push(OBJ_VAL(copyString(name, (int)strlen(name))));
     push(OBJ_VAL(newNative(function)));
@@ -66,6 +70,7 @@ static void defineNatives(){
     defineNative("num", n_num);
     defineNative("str", n_str);
     defineNative("len", n_len);
+    defineNative("exit", n_exit);
 }
 
 void initVM(){
