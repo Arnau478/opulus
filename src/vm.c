@@ -1,3 +1,4 @@
+#include <math.h>
 #include <string.h>
 #include <time.h>
 #include "vm.h"
@@ -341,7 +342,7 @@ static InterpretResult run(){
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
                 break;
-            case OP_SPAWN_ARRAY:
+            case OP_SPAWN_ARRAY: {
                 int elementCount = READ_BYTE();
                 ObjArray *array = newArray();
                 for(int i = 0; i < elementCount; i++){
@@ -349,6 +350,35 @@ static InterpretResult run(){
                 }
                 vm.stackTop -= elementCount;
                 push(OBJ_VAL(array));
+                break;
+            }
+            case OP_INDEX: {
+                if(!IS_ARRAY(peek(1))){
+                    runtimeError("Only arrays are indexable");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                if(!IS_NUMBER(peek(0))){
+                    runtimeError("Index must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                double dIndex = AS_NUMBER(pop());
+                if(ceilf(dIndex) != dIndex){
+                    runtimeError("Index must be integer");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                int index = (int)dIndex;
+
+                ObjArray *array = AS_ARRAY(pop());
+
+                if(index >= array->count || index < 0){
+                    runtimeError("Index %i out of bounds", index);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                push(array->values[index]);
+                break;
+            }
         }
     }
 

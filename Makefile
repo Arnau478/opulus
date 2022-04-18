@@ -1,6 +1,6 @@
 CC=gcc
 
-CFLAGS=
+CFLAGS=-lm
 
 C_SOURCES=$(wildcard src/*.c)
 

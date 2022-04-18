@@ -365,7 +365,9 @@ static void array(bool canAssign){
 }
 
 static void indexer(bool canAssign){
-    
+    expression();
+    consume(TOKEN_RIGHT_SQUARE, "Expected ']' after array index");
+    emitByte(OP_INDEX);
 }
 
 ParseRule rules[] = {
