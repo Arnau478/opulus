@@ -99,6 +99,12 @@ int disassembleInstruction(Chunk *chunk, int offset){
             return byteInstruction("OP_CALL", chunk, offset);
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", offset);
+        case OP_SPAWN_ARRAY:
+            return byteInstruction("OP_SPAWN_ARRAY", chunk, offset);
+        case OP_INDEX:
+            return simpleInstruction("OP_INDEX", offset);
+        case OP_WRITE_INDEX:
+            return simpleInstruction("OP_WRITE_INDEX", offset);
         default:
             printf("Unknown opcode %d\n", instruction);
     }

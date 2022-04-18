@@ -1,3 +1,4 @@
+#include <math.h>
 #include <string.h>
 #include <time.h>
 #include "vm.h"
@@ -151,6 +152,29 @@ static void concatenate(){
 
     ObjString *result = takeString(chars, length);
     push(OBJ_VAL(result));
+}
+
+static void addToArray(ObjArray *array, Value value){
+    if(array->count >= array->capacity){
+        int oldCapacity = array->capacity;
+        array->capacity = GROW_CAPACITY(oldCapacity);
+        array->values = GROW_ARRAY(Value, array->values, oldCapacity, array->capacity);
+    }
+
+    array->values[array->count] = value;
+    array->count++;
+}
+
+static void setIndex(ObjArray *array, int index, Value value){
+    if(index >= array->count){
+        for(int i = 0; i < (index+1)-array->count; i++){
+            addToArray(array, NIL_VAL);
+        }
+        addToArray(array, value);
+    }
+    else{
+        array->values[index] = value;
+    }
 }
 
 static InterpretResult run(){
@@ -330,6 +354,67 @@ static InterpretResult run(){
                 push(result);
                 frame = &vm.frames[vm.frameCount - 1];
                 break;
+            case OP_SPAWN_ARRAY: {
+                int elementCount = READ_BYTE();
+                ObjArray *array = newArray();
+                for(int i = 0; i < elementCount; i++){
+                    addToArray(array, *(vm.stackTop-(elementCount-i)));
+                }
+                vm.stackTop -= elementCount;
+                push(OBJ_VAL(array));
+                break;
+            }
+            case OP_INDEX: {
+                if(!IS_ARRAY(peek(1))){
+                    runtimeError("Only arrays are indexable");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                if(!IS_NUMBER(peek(0))){
+                    runtimeError("Index must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                double dIndex = AS_NUMBER(pop());
+                if(ceilf(dIndex) != dIndex){
+                    runtimeError("Index must be integer");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                int index = (int)dIndex;
+
+                ObjArray *array = AS_ARRAY(pop());
+
+                if(index >= array->count || index < 0){
+                    runtimeError("Index %i out of bounds", index);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                push(array->values[index]);
+                break;
+            }
+            case OP_WRITE_INDEX: {
+                if(!IS_ARRAY(peek(2))){
+                    runtimeError("Only arrays are indexable");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                if(!IS_NUMBER(peek(1))){
+                    runtimeError("Index must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                Value value = pop();
+
+                double dIndex = AS_NUMBER(pop());
+                if(ceilf(dIndex) != dIndex){
+                    runtimeError("Index must be an integer");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                int index = (int)dIndex;
+
+                ObjArray *array = AS_ARRAY(peek(0));
+
+                setIndex(array, index, value);
+                break;
+            }
         }
     }
 

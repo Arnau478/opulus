@@ -77,6 +77,14 @@ static void printFunction(ObjFunction *function){
     printf("<fn %s>", function->name->chars);
 }
 
+ObjArray *newArray(){
+    ObjArray *array = ALLOCATE_OBJ(ObjArray, OBJ_ARRAY);
+    array->values = NULL;
+    array->capacity = 0;
+    array->count = 0;
+    return array;
+}
+
 void printObject(Value value){
     switch(OBJ_TYPE(value)){
         case OBJ_FUNCTION:
@@ -87,6 +95,16 @@ void printObject(Value value){
             break;
         case OBJ_STRING:
             printf("%s", AS_CSTRING(value));
+            break;
+        case OBJ_ARRAY:
+            printf("[");
+            bool first = true;
+            ObjArray *array = AS_ARRAY(value);
+            for(int i = 0; i < array->count; i++){
+                if(i != 0) printf(", ");
+                printValue(array->values[i]);
+            }
+            printf("]");
             break;
         default:
             printf("<OBJ>");
