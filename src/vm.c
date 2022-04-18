@@ -40,6 +40,18 @@ static Value n_str(int argCount, Value *args){
     return NIL_VAL;
 }
 
+static Value n_len(int argCount, Value *args){
+    if(argCount == 1){
+        if(IS_STRING(args[0])){
+            return NUMBER_VAL((double)AS_STRING(args[0])->length);
+        }
+        else if(IS_ARRAY(args[0])){
+            return NUMBER_VAL((double)AS_ARRAY(args[0])->count);
+        }
+    }
+    return NIL_VAL;
+}
+
 static void defineNative(const char *name, NativeFn function){
     push(OBJ_VAL(copyString(name, (int)strlen(name))));
     push(OBJ_VAL(newNative(function)));
@@ -53,6 +65,7 @@ static void defineNatives(){
     defineNative("input", n_input);
     defineNative("num", n_num);
     defineNative("str", n_str);
+    defineNative("len", n_len);
 }
 
 void initVM(){
