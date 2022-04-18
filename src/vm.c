@@ -165,6 +165,18 @@ static void addToArray(ObjArray *array, Value value){
     array->count++;
 }
 
+static void setIndex(ObjArray *array, int index, Value value){
+    if(index >= array->count){
+        for(int i = 0; i < (index+1)-array->count; i++){
+            addToArray(array, NIL_VAL);
+        }
+        addToArray(array, value);
+    }
+    else{
+        array->values[index] = value;
+    }
+}
+
 static InterpretResult run(){
     CallFrame *frame = &vm.frames[vm.frameCount - 1];
 
@@ -377,6 +389,30 @@ static InterpretResult run(){
                 }
 
                 push(array->values[index]);
+                break;
+            }
+            case OP_WRITE_INDEX: {
+                if(!IS_ARRAY(peek(2))){
+                    runtimeError("Only arrays are indexable");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                if(!IS_NUMBER(peek(1))){
+                    runtimeError("Index must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                Value value = pop();
+
+                double dIndex = AS_NUMBER(pop());
+                if(ceilf(dIndex) != dIndex){
+                    runtimeError("Index must be an integer");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                int index = (int)dIndex;
+
+                ObjArray *array = AS_ARRAY(peek(0));
+
+                setIndex(array, index, value);
                 break;
             }
         }

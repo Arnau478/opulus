@@ -36,6 +36,7 @@ typedef enum {
     OP_RETURN,
     OP_SPAWN_ARRAY,
     OP_INDEX,
+    OP_WRITE_INDEX,
 } OpCode;
 
 typedef struct {
