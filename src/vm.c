@@ -389,8 +389,31 @@ static InterpretResult run(){
             }
             case OP_INDEX: {
                 if(!IS_ARRAY(peek(1))){
-                    runtimeError("Only arrays are indexable");
-                    return INTERPRET_RUNTIME_ERROR;
+                    if(!IS_STRING(peek(1))){
+                        runtimeError("Only arrays are indexable");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+                    if(!IS_NUMBER(peek(0))){
+                        runtimeError("Index must be a number");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+
+                    double dIndex = AS_NUMBER(pop());
+                    if(ceilf(dIndex) != dIndex){
+                        runtimeError("Index must be integer");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+                    int index = (int)dIndex;
+
+                    ObjString *string = AS_STRING(pop());
+
+                    if(index >= string->length || index < 0){
+                        runtimeError("Index %i out of bounds", index);
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+
+                    push(OBJ_VAL(copyString(string->chars + index, 1)));
+                    break;
                 }
                 if(!IS_NUMBER(peek(0))){
                     runtimeError("Index must be a number");
