@@ -4,7 +4,7 @@ Opulus is a high-performance bytecode-compiled programming language
 Developed and designed by Arnau478
 
 # Build opulus
-To compiler from source on Linux, follow the steps below.
+To compile from source on Linux, follow the steps below.
 
 1. Download [the latest release](https://github.com/Arnau478/opulus/releases)
 2. Make sure you have `gcc` and `make` installed
