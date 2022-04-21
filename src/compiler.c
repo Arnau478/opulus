@@ -371,6 +371,7 @@ ParseRule rules[] = {
     [TOKEN_STRING]        = {string,   NULL,   PREC_NONE},
     [TOKEN_NUMBER]        = {number,   NULL,   PREC_NONE},
     [TOKEN_AND]           = {NULL,     and,    PREC_AND},
+    [TOKEN_CASE]          = {NULL,     NULL,   PREC_NONE},
     [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
     [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
     [TOKEN_FALSE]         = {literal,  NULL,   PREC_NONE},
@@ -382,6 +383,7 @@ ParseRule rules[] = {
     [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
     [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
     [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
+    [TOKEN_SWITCH]        = {NULL,     NULL,   PREC_NONE},
     [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
     [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
     [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
@@ -587,6 +589,31 @@ static void returnStatement(){
     }
 }
 
+static void switchStatement(){
+    consume(TOKEN_LEFT_PAREN, "Expected '(' after 'switch' keyword");
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expected ')' after switch expression");
+    consume(TOKEN_LEFT_BRACE, "Expected '{' at switch body");
+
+    while(!match(TOKEN_RIGHT_BRACE)){
+        if(match(TOKEN_CASE)){
+            consume(TOKEN_LEFT_PAREN, "Expected '(' after 'case'");
+            emitByte(OP_CLONE);
+            expression();
+            emitByte(OP_EQUAL);
+            int caseJump = emitJump(OP_JUMP_IF_FALSE);
+            consume(TOKEN_RIGHT_PAREN, "Expected ')' after case expression");
+            consume(TOKEN_LEFT_BRACE, "Expected '{' at case body start");
+            block();
+            patchJump(caseJump);
+            emitByte(OP_POP);
+        }
+        else{
+            errorAtCurrent("Expected case on switch body");
+        }
+    }
+}
+
 static void whileStatement(){
     int loopStart = currentChunk()->count;
     consume(TOKEN_LEFT_PAREN, "Expected '(' after 'while' keyword");
@@ -651,6 +678,9 @@ static void statement(){
     }
     else if(match(TOKEN_RETURN)){
         returnStatement();
+    }
+    else if(match(TOKEN_SWITCH)){
+        switchStatement();
     }
     else if(match(TOKEN_WHILE)){
         whileStatement();
