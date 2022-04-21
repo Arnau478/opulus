@@ -1,3 +1,4 @@
+#include <math.h>
 #include <string.h>
 #include <time.h>
 #include "vm.h"
@@ -39,6 +40,22 @@ static Value n_str(int argCount, Value *args){
     return NIL_VAL;
 }
 
+static Value n_len(int argCount, Value *args){
+    if(argCount == 1){
+        if(IS_STRING(args[0])){
+            return NUMBER_VAL((double)AS_STRING(args[0])->length);
+        }
+        else if(IS_ARRAY(args[0])){
+            return NUMBER_VAL((double)AS_ARRAY(args[0])->count);
+        }
+    }
+    return NIL_VAL;
+}
+
+static Value n_exit(int argCount, Value *args){
+    exit(0);
+}
+
 static void defineNative(const char *name, NativeFn function){
     push(OBJ_VAL(copyString(name, (int)strlen(name))));
     push(OBJ_VAL(newNative(function)));
@@ -48,10 +65,14 @@ static void defineNative(const char *name, NativeFn function){
 }
 
 static void defineNatives(){
-    defineNative("clock", n_clock);
-    defineNative("input", n_input);
-    defineNative("num", n_num);
-    defineNative("str", n_str);
+#define NATIVE(name) defineNative(#name, n_ ## name)
+    NATIVE(clock);
+    NATIVE(input);
+    NATIVE(num);
+    NATIVE(str);
+    NATIVE(len);
+    NATIVE(exit);
+#undef NATIVE
 }
 
 void initVM(){
@@ -80,18 +101,23 @@ static void runtimeError(const char *format, ...){
     vfprintf(stderr, format, args);
     va_end(args);
     fputs("\n", stderr);
-
+    
     for(int i = vm.frameCount - 1; i >= 0; i--){
-        CallFrame *frame = &vm.frames[i];
-        ObjFunction *function = frame->function;
-        size_t instruction = frame->ip - function->chunk.code - 1;
-        fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+        if(vm.frameCount < 8 || i+5 > vm.frameCount || i == 0){
+            CallFrame *frame = &vm.frames[i];
+            ObjFunction *function = frame->function;
+            size_t instruction = frame->ip - function->chunk.code - 1;
+            fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
 
-        if(function->name == NULL){
-            fprintf(stderr, "script\n");
+            if(function->name == NULL){
+                fprintf(stderr, "script\n");
+            }
+            else{
+                fprintf(stderr, "%s()\n", function->name->chars);
+            }
         }
-        else{
-            fprintf(stderr, "%s()\n", function->name->chars);
+        else if(vm.frameCount < 8 || i+5 == vm.frameCount){
+            printf("...\n");
         }
     }
 
@@ -151,6 +177,29 @@ static void concatenate(){
 
     ObjString *result = takeString(chars, length);
     push(OBJ_VAL(result));
+}
+
+static void addToArray(ObjArray *array, Value value){
+    if(array->count >= array->capacity){
+        int oldCapacity = array->capacity;
+        array->capacity = GROW_CAPACITY(oldCapacity);
+        array->values = GROW_ARRAY(Value, array->values, oldCapacity, array->capacity);
+    }
+
+    array->values[array->count] = value;
+    array->count++;
+}
+
+static void setIndex(ObjArray *array, int index, Value value){
+    if(index >= array->count){
+        for(int i = 0; i < (index+1)-array->count; i++){
+            addToArray(array, NIL_VAL);
+        }
+        addToArray(array, value);
+    }
+    else{
+        array->values[index] = value;
+    }
 }
 
 static InterpretResult run(){
@@ -333,6 +382,90 @@ static InterpretResult run(){
             case OP_CLONE:
                 push(*(vm.stackTop-1));
                 break;
+            case OP_SPAWN_ARRAY: {
+                int elementCount = READ_BYTE();
+                ObjArray *array = newArray();
+                for(int i = 0; i < elementCount; i++){
+                    addToArray(array, *(vm.stackTop-(elementCount-i)));
+                }
+                vm.stackTop -= elementCount;
+                push(OBJ_VAL(array));
+                break;
+            }
+            case OP_INDEX: {
+                if(!IS_ARRAY(peek(1))){
+                    if(!IS_STRING(peek(1))){
+                        runtimeError("Only arrays are indexable");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+                    if(!IS_NUMBER(peek(0))){
+                        runtimeError("Index must be a number");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+
+                    double dIndex = AS_NUMBER(pop());
+                    if(ceilf(dIndex) != dIndex){
+                        runtimeError("Index must be integer");
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+                    int index = (int)dIndex;
+
+                    ObjString *string = AS_STRING(pop());
+
+                    if(index >= string->length || index < 0){
+                        runtimeError("Index %i out of bounds", index);
+                        return INTERPRET_RUNTIME_ERROR;
+                    }
+
+                    push(OBJ_VAL(copyString(string->chars + index, 1)));
+                    break;
+                }
+                if(!IS_NUMBER(peek(0))){
+                    runtimeError("Index must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                double dIndex = AS_NUMBER(pop());
+                if(ceilf(dIndex) != dIndex){
+                    runtimeError("Index must be integer");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                int index = (int)dIndex;
+
+                ObjArray *array = AS_ARRAY(pop());
+
+                if(index >= array->count || index < 0){
+                    runtimeError("Index %i out of bounds", index);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                push(array->values[index]);
+                break;
+            }
+            case OP_WRITE_INDEX: {
+                if(!IS_ARRAY(peek(2))){
+                    runtimeError("Only arrays are indexable");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                if(!IS_NUMBER(peek(1))){
+                    runtimeError("Index must be a number");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+
+                Value value = pop();
+
+                double dIndex = AS_NUMBER(pop());
+                if(ceilf(dIndex) != dIndex){
+                    runtimeError("Index must be an integer");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                int index = (int)dIndex;
+
+                ObjArray *array = AS_ARRAY(peek(0));
+
+                setIndex(array, index, value);
+                break;
+            }
         }
     }
 

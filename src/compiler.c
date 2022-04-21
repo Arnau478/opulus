@@ -347,11 +347,42 @@ static void call(bool canAssign){
     emitBytes(OP_CALL, argCount);
 }
 
+static void array(bool canAssign){
+    int elementCount = 0;
+    if(!check(TOKEN_RIGHT_SQUARE)){
+        do {
+            expression();
+            if(elementCount == 255){
+                error("Cannot construct arrays with more than 255 elements");
+            }
+            elementCount++;
+        }
+        while(match(TOKEN_COMMA));
+    }
+    consume(TOKEN_RIGHT_SQUARE, "Expected ']' after array construction");
+    
+    emitBytes(OP_SPAWN_ARRAY, elementCount);
+}
+
+static void indexer(bool canAssign){
+    expression();
+    consume(TOKEN_RIGHT_SQUARE, "Expected ']' after array index");
+    if(match(TOKEN_EQUAL)){
+        expression();
+        emitByte(OP_WRITE_INDEX);
+    }
+    else{
+        emitByte(OP_INDEX);
+    }
+}
+
 ParseRule rules[] = {
     [TOKEN_LEFT_PAREN]    = {grouping, call,   PREC_CALL},
     [TOKEN_RIGHT_PAREN]   = {NULL,     NULL,   PREC_NONE},
-    [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE}, 
+    [TOKEN_LEFT_BRACE]    = {NULL,     NULL,   PREC_NONE},
     [TOKEN_RIGHT_BRACE]   = {NULL,     NULL,   PREC_NONE},
+    [TOKEN_LEFT_SQUARE]   = {array,    indexer,PREC_CALL},
+    [TOKEN_RIGHT_SQUARE]  = {NULL,     NULL,   PREC_NONE},
     [TOKEN_COMMA]         = {NULL,     NULL,   PREC_NONE},
     [TOKEN_DOT]           = {NULL,     NULL,   PREC_NONE},
     [TOKEN_MINUS]         = {unary,    binary, PREC_TERM},

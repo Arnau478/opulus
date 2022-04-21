@@ -31,6 +31,17 @@ static void freeObject(Obj *object){
             FREE(ObjString, object);
             break;
         }
+        case OBJ_ARRAY: {
+            ObjArray *array = (ObjArray *)object;
+            FREE_ARRAY(Value, array->values, array->capacity);
+            FREE(ObjArray, object);
+            break;
+        }
+#ifdef DEBUG
+        default: {
+            printf("Undefined free behavior for obj type %i\n", object->type);
+        }
+#endif
     }
 }
 
