@@ -65,12 +65,14 @@ static void defineNative(const char *name, NativeFn function){
 }
 
 static void defineNatives(){
-    defineNative("clock", n_clock);
-    defineNative("input", n_input);
-    defineNative("num", n_num);
-    defineNative("str", n_str);
-    defineNative("len", n_len);
-    defineNative("exit", n_exit);
+#define NATIVE(name) defineNative(#name, n_ ## name)
+    NATIVE(clock);
+    NATIVE(input);
+    NATIVE(num);
+    NATIVE(str);
+    NATIVE(len);
+    NATIVE(exit);
+#undef NATIVE
 }
 
 void initVM(){
